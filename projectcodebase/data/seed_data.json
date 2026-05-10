@@ -1,0 +1,16 @@
+{
+  "traits": [
+    {
+      "name": "Brave",
+      "category": "personality",
+      "description": "Faces danger without fear",
+      "tags": ["personality", "positive"]
+    },
+    {
+      "name": "Green Skin",
+      "category": "physical",
+      "description": "Green-colored skin",
+      "tags": ["physical", "fantasy", "goblin"]
+    }
+  ]
+}
