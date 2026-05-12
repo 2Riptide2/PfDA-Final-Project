@@ -21,23 +21,19 @@ def create_trait(name, category, description, tag_names):
     session.close()
 
 
-def get_traits(include_tags=None, exclude_tags=None):
+def get_traits(search_text=None, include_tags=None):
     session = SessionLocal()
     query = session.query(Trait)
 
+    # 🔍 Name search
+    if search_text:
+        query = query.filter(Trait.name.ilike(f"%{search_text}%"))
+
+    # 🏷 Tag filtering
     if include_tags:
         query = query.join(TraitTag).join(Tag).filter(Tag.name.in_(include_tags))
 
     traits = query.all()
-
-    if exclude_tags:
-        filtered = []
-        for trait in traits:
-            trait_tag_names = [tt.tag.name for tt in trait.tags]
-            if not any(tag in trait_tag_names for tag in exclude_tags):
-                filtered.append(trait)
-        traits = filtered
-
     session.close()
     return traits
 
@@ -79,3 +75,15 @@ def update_trait(trait_id, name, category, description, tag_names):
 
 def get_trait_tags(trait):
     return [tt.tag.name for tt in trait.tags]
+
+def delete_trait(trait_id):
+    session = SessionLocal()
+
+    # Delete tag links first (important for DB integrity)
+    session.query(TraitTag).filter_by(trait_id=trait_id).delete()
+
+    # Delete the trait itself
+    session.query(Trait).filter_by(id=trait_id).delete()
+
+    session.commit()
+    session.close()

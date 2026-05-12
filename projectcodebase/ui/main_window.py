@@ -6,6 +6,8 @@ from PySide6.QtWidgets import (
 from services.trait_service import get_traits
 from ui.trait_editor import TraitEditor
 import sys
+from services.trait_service import delete_trait
+
 
 
 class MainWindow(QWidget):
@@ -27,8 +29,6 @@ class MainWindow(QWidget):
         self.layout.addWidget(self.add_button)
 
         self.setLayout(self.layout)
-
-        # 🔥 THIS WAS MISSING
         self.load_traits()
 
     def load_traits(self):
@@ -43,6 +43,19 @@ class MainWindow(QWidget):
         self.editor.show()
 
 
+
+def delete_selected_trait(self):
+    selected_index = self.list_widget.currentRow()
+
+    if selected_index < 0:
+        return
+
+    trait = self.current_traits[selected_index]
+
+    delete_trait(trait.id)
+
+    self.load_traits()
+    
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
