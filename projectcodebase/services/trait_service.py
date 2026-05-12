@@ -40,3 +40,42 @@ def get_traits(include_tags=None, exclude_tags=None):
 
     session.close()
     return traits
+
+def get_trait_by_id(trait_id):
+    session = SessionLocal()
+    trait = session.query(Trait).filter_by(id=trait_id).first()
+    session.close()
+    return trait
+
+
+def update_trait(trait_id, name, category, description, tag_names):
+    session = SessionLocal()
+
+    trait = session.query(Trait).filter_by(id=trait_id).first()
+    if not trait:
+        session.close()
+        return
+
+    trait.name = name
+    trait.category = category
+    trait.description = description
+
+    # Remove old tags
+    session.query(TraitTag).filter_by(trait_id=trait_id).delete()
+
+    # Add new tags
+    for tag_name in tag_names:
+        tag = session.query(Tag).filter_by(name=tag_name).first()
+        if not tag:
+            tag = Tag(name=tag_name)
+            session.add(tag)
+            session.commit()
+
+        session.add(TraitTag(trait_id=trait_id, tag_id=tag.id))
+
+    session.commit()
+    session.close()
+
+
+def get_trait_tags(trait):
+    return [tt.tag.name for tt in trait.tags]
